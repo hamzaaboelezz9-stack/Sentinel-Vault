@@ -1,0 +1,10 @@
+node_modules
+.git
+.env
+.local-data
+releases
+test-results
+playwright-report
+coverage
+build
+docs/SOURCEBOOK.md

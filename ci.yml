@@ -1,0 +1,28 @@
+name: security-and-build
+on: [push, pull_request]
+permissions: {contents: read}
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-bookworm
+        env: {POSTGRES_USER: sentinel, POSTGRES_PASSWORD: public-ci-only-password, POSTGRES_DB: sentinel_test}
+        ports: ["5432:5432"]
+        options: --health-cmd "pg_isready -U sentinel -d sentinel_test" --health-interval 5s --health-timeout 5s --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '24', cache: npm}
+      - run: npm ci --ignore-scripts
+      - run: npm run check
+      - run: npm test
+        env: {TEST_DATABASE_URL: 'postgresql://sentinel:public-ci-only-password@localhost:5432/sentinel_test'}
+      - run: npm audit --audit-level=moderate
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - run: docker compose config --quiet && docker compose up -d --build
+      - run: timeout 120 bash -c 'until curl --fail --silent http://localhost:8080/api/health; do sleep 2; done'
+      - run: docker compose down
+        if: always()

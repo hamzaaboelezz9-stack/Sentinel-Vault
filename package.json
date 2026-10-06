@@ -1,0 +1,59 @@
+{
+  "name": "sentinel-vault",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Self-hosted client-encrypted password vault with passkeys, encrypted sharing and offline clients",
+  "license": "MIT",
+  "engines": {
+    "node": ">=24.19.0"
+  },
+  "scripts": {
+    "dev": "vite --config apps/web/vite.config.ts --host 127.0.0.1",
+    "dev:api": "node --env-file=.env --import tsx apps/api/src/main.ts",
+    "build": "node scripts/build.mjs",
+    "check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "setup": "node scripts/setup.mjs",
+    "docs:source": "python scripts/source-book.py",
+    "package": "python scripts/package.py",
+    "format": "prettier --write apps packages extensions tests scripts *.ts *.json *.yml deploy"
+  },
+  "dependencies": {
+    "@fastify/cookie": "11.0.2",
+    "@fastify/helmet": "13.0.2",
+    "@fastify/static": "10.1.5",
+    "@fastify/swagger": "9.5.1",
+    "@scure/bip39": "2.4.0",
+    "@simplewebauthn/browser": "14.0.0",
+    "@simplewebauthn/server": "14.0.3",
+    "argon2-browser": "1.18.0",
+    "fastify": "5.12.5",
+    "libsodium-wrappers-sumo": "0.8.4",
+    "otpauth": "9.4.1",
+    "papaparse": "5.5.3",
+    "pg": "8.16.3",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "zod": "4.1.13",
+    "zxcvbn": "4.4.2"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.8",
+    "@playwright/test": "1.58.2",
+    "@types/argon2-browser": "1.18.4",
+    "@types/node": "24.10.1",
+    "@types/papaparse": "5.5.1",
+    "@types/pg": "8.15.6",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "@types/zxcvbn": "4.4.5",
+    "esbuild": "0.27.2",
+    "prettier": "3.9.9",
+    "tsx": "4.21.0",
+    "typescript": "5.9.3",
+    "vite": "8.3.2",
+    "vitest": "5.0.3"
+  }
+}

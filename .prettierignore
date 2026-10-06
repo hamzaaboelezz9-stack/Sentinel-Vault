@@ -1,0 +1,6 @@
+apps/web/public/vendor
+build
+releases
+docs/SOURCEBOOK.md
+docs/openapi.json
+package-lock.json

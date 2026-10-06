@@ -1,0 +1,49 @@
+services:
+  init:
+    image: alpine:3.22
+    restart: "no"
+    entrypoint: ["/bin/sh", "/init-secrets.sh"]
+    volumes:
+      - secrets:/run/sentinel-secrets
+      - ./deploy/init-secrets.sh:/init-secrets.sh:ro
+    network_mode: none
+  db:
+    image: postgres:17-bookworm
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: sentinel
+      POSTGRES_USER: sentinel
+      POSTGRES_PASSWORD_FILE: /run/sentinel-secrets/database-password
+    depends_on:
+      init: { condition: service_completed_successfully }
+    volumes:
+      - database:/var/lib/postgresql/data
+      - secrets:/run/sentinel-secrets:ro
+    networks: [private]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sentinel -d sentinel"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      PUBLIC_ORIGIN: ${PUBLIC_ORIGIN:-http://localhost:8080}
+      RP_ID: ${RP_ID:-localhost}
+      TRUST_PROXY: ${TRUST_PROXY:-false}
+    depends_on:
+      db: { condition: service_healthy }
+    ports: ["127.0.0.1:8080:8080"]
+    volumes: ["secrets:/run/sentinel-secrets"]
+    networks: [private, outbound]
+    read_only: true
+    tmpfs: ["/tmp:size=64m,noexec,nosuid"]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+volumes:
+  secrets:
+  database:
+networks:
+  private: { internal: true }
+  outbound:

@@ -1,0 +1,14 @@
+node_modules/
+build/
+releases/
+.env
+secrets/
+test-results/
+playwright-report/
+coverage/
+.local-data/
+__pycache__/
+*.log
+.DS_Store
+
+backups/
